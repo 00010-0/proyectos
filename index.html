@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Antonio Sánchez — Creación & Diseño</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --accent: #e8ff47;
+      --accent2: #ff4d6d;
+      --surface: rgba(12, 12, 16, 0.85);
+      --glass: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Syne', sans-serif;
+      background: #07070a;
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    #canvas-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .content {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 20px 80px;
+    }
+
+    /* --- AVATAR --- */
+    .avatar-ring {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      margin-bottom: 24px;
+    }
+    .avatar-ring::before {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, var(--accent), var(--accent2), var(--accent));
+      animation: spin 4s linear infinite;
+      z-index: -1;
+    }
+    .avatar-ring::after {
+      content: '';
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      background: conic-gradient(from 180deg, var(--accent2), transparent, var(--accent));
+      opacity: 0.3;
+      animation: spin 8s linear infinite reverse;
+      z-index: -2;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .avatar-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      border: 2px solid #0f0f1a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -2px;
+      overflow: hidden;
+    }
+
+    /* --- HEADER --- */
+    .header-name {
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1;
+      text-align: center;
+      background: linear-gradient(135deg, #fff 40%, rgba(255,255,255,0.5));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .header-role {
+      margin-top: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-align: center;
+    }
+    .header-bio {
+      margin-top: 14px;
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.45);
+      text-align: center;
+      max-width: 320px;
+      line-height: 1.6;
+    }
+
+    /* --- STATS --- */
+    .stats-row {
+      display: flex;
+      gap: 28px;
+      margin: 28px 0 36px;
+    }
+    .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .stat-num {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .stat-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+    }
+    .stat-divider {
+      width: 1px;
+      height: 36px;
+      background: var(--border);
+      align-self: center;
+    }
+
+    /* --- LINKS --- */
+    .links-grid {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .link-card {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 22px;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      text-decoration: none;
+      color: #fff;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      cursor: pointer;
+      overflow: hidden;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+      animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .link-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px) scale(1.01);
+      box-shadow: 0 20px 60px rgba(232,255,71,0.12), 0 0 0 1px rgba(232,255,71,0.15);
+    }
+
+    .link-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(232,255,71,0.06) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .link-card:hover::before { opacity: 1; }
+
+    .link-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+      transition: left 0.6s ease;
+    }
+    .link-card:hover::after { left: 150%; }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .link-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .link-info {
+      flex: 1;
+      min-width: 0;
+      position: relative;
+      z-index: 1;
+    }
+    .link-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .link-desc {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.4);
+      margin-top: 2px;
+      letter-spacing: 0.5px;
+    }
+
+    .link-arrow {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .link-card:hover .link-arrow {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .link-card:hover .link-arrow svg {
+      stroke: #000;
+    }
+
+    /* Tag badge */
+    .link-tag {
+      position: absolute;
+      top: 10px; right: 56px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 100px;
+      background: rgba(232,255,71,0.1);
+      color: var(--accent);
+      border: 1px solid rgba(232,255,71,0.2);
+    }
+
+    /* --- SECTION LABEL --- */
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+      align-self: flex-start;
+      margin-bottom: 4px;
+      margin-top: 8px;
+    }
+
+    /* --- FOOTER --- */
+    .footer {
+      margin-top: 48px;
+      text-align: center;
+    }
+    .footer-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.2);
+      text-transform: uppercase;
+    }
+    .footer-dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin: 0 8px;
+      vertical-align: middle;
+      animation: pulse 2s ease infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    /* Animated delay utilities */
+    .delay-1 { animation-delay: 0.05s; }
+    .delay-2 { animation-delay: 0.12s; }
+    .delay-3 { animation-delay: 0.19s; }
+    .delay-4 { animation-delay: 0.26s; }
+    .delay-5 { animation-delay: 0.33s; }
+    .delay-6 { animation-delay: 0.40s; }
+    .delay-7 { animation-delay: 0.47s; }
+    .delay-h { animation-delay: 0s; }
+
+    /* Header animation */
+    .fade-down {
+      animation: fadeDown 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cursor glow */
+    .glow-cursor {
+      position: fixed;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(232,255,71,0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 1;
+      transform: translate(-50%, -50%);
+      transition: transform 0.12s ease;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="canvas-bg"></canvas>
+<div class="glow-cursor" id="glowCursor"></div>
+
+<div class="content">
+
+  <!-- Avatar -->
+  <div class="avatar-ring fade-down">
+    <div class="avatar-inner">AS</div>
+  </div>
+
+  <!-- Header -->
+  <h1 class="header-name fade-down" style="animation-delay:0.08s">Antonio Sánchez</h1>
+  <p class="header-role fade-down" style="animation-delay:0.14s">Creación &amp; Diseño</p>
+  <p class="header-bio fade-down" style="animation-delay:0.20s">
+    Diseñador y desarrollador creativo. Construyo experiencias digitales que conectan marcas con personas.
+  </p>
+
+  <!-- Stats -->
+  <div class="stats-row fade-down" style="animation-delay:0.26s">
+    <div class="stat">
+      <span class="stat-num">7</span>
+      <span class="stat-label">Proyectos</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <span class="stat-num">∞</span>
+      <span class="stat-label">Ideas</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <span class="stat-num">01</span>
+      <span class="stat-label">Visión</span>
+    </div>
+  </div>
+
+  <!-- Links -->
+  <div class="links-grid">
+
+    <span class="section-label fade-down" style="animation-delay:0.28s">// Proyectos destacados</span>
+
+    <!-- 1 -->
+    <a href="https://00010-0.github.io/curso/" target="_blank" class="link-card delay-1">
+      <div class="link-icon" style="background:linear-gradient(135deg,#1a1aff22,#0000ff11); border:1px solid #3333ff33">
+        🎓
+      </div>
+      <div class="link-info">
+        <div class="link-title">Curso Online</div>
+        <div class="link-desc">formación · aprendizaje digital</div>
+      </div>
+      <div class="link-arrow">
+        <svg width="14" height="14" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+      </div>
+    </a>
+
+    <!-- 2 -->
+    <a href="https://00010-0.github.io/NEXUSNEXTLEVEL/" target="_blank" class="link-card delay-2">
+      <span class="link-tag">Featured</span>
+      <div class="link-icon" style="background:linear-gradient(135deg,#e8ff4722,#e8ff4711); border:1px solid #e8ff4733">
+        ⚡
+      </div>
+      <div class="link-info">
+        <div class="link-title">Nexus Next Level</div>
+        <div class="link-desc">branding · diseño web premium</div>
+      </div>
+      <div class="link-arrow">
+        <svg width="14" height="14" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+      </div>
+    </a>
+
+    <!-- 3 -->
+    <a href="https://00010-0.github.io/PomesBurger/" target="_blank" class="link-card delay-3">
+      <div class="link-icon" style="background:linear-gradient(135deg,#ff6b0022,#ff6b0011); border:1px solid #ff6b0033">
+        🍔
+      </div>
+      <div class="link-info">
+        <div class="link-title">Pomes Burger</div>
+        <div class="link-desc">hostelería · identidad visual</div>
+      </div>
+      <div class="link-arrow">
+        <svg width="14" height="14" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+      </div>
+    </a>
+
+    <!-- 4 -->
+    <a href="https://00010-0.github.io/labananastudios/" target="_blank" class="link-card delay-4">
+      <div class="link-icon" style="background:linear-gradient(135deg,#ffdd0022,#ffdd0011); border:1px solid #ffdd0033">
+        🍌
+      </div>
+      <div class="link-info">
+        <div class="link-title">La Banana Studios</div>
+        <div class="link-desc">estudio creativo · producción</div>
+      </div>
+      <div class="link-arrow">
+        <svg width="14" height="14" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+      </div>
+    </a>
+
+    <!-- 5 -->
+    <a href="https://00010-0.github.io/24stuido.es/" target="_blank" class="link-card delay-5">
+      <span class="link-tag">Studio</span>
+      <div class="link-icon" style="background:linear-gradient(135deg,#ff4d6d22,#ff4d6d11); border:1px solid #ff4d6d33">
+        🎨
+      </div>
+      <div class="link-info">
+        <div class="link-title">24 Studio</div>
+        <div class="link-desc">diseño · creatividad · producción</div>
+      </div>
+      <div class="link-arrow">
+        <svg width="14" height="14" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+      </div>
+    </a>
+
+    <!-- 6 -->
+    <a href="https://00010-0.github.io/IBERMAQ/" target="_blank" class="link-card delay-6">
+      <div class="link-icon" style="background:linear-gradient(135deg,#00c6ff22,#00c6ff11); border:1px solid #00c6ff33">
+        🏭
+      </div>
+      <div class="link-info">
+        <div class="link-title">Ibermaq</div>
+        <div class="link-desc">industrial · web corporativa</div>
+      </div>
+      <div class="link-arrow">
+        <svg width="14" height="14" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+      </div>
+    </a>
+
+    <!-- 7 -->
+    <a href="https://00010-0.github.io/miswallets/" target="_blank" class="link-card delay-7">
+      <div class="link-icon" style="background:linear-gradient(135deg,#9945ff22,#9945ff11); border:1px solid #9945ff33">
+        💼
+      </div>
+      <div class="link-info">
+        <div class="link-title">Mis Wallets</div>
+        <div class="link-desc">fintech · gestión digital</div>
+      </div>
+      <div class="link-arrow">
+        <svg width="14" height="14" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer fade-down" style="animation-delay:0.6s">
+    <p class="footer-tag">
+      Diseñado por Antonio Sánchez
+      <span class="footer-dot"></span>
+      2025
+    </p>
+  </div>
+
+</div>
+
+<script>
+  // ─── Three.js Background ───────────────────────────────────────
+  const canvas = document.getElementById('canvas-bg');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x07070a, 1);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 200);
+  camera.position.set(0, 0, 18);
+
+  // ─── Particles ────────────────────────────────────────────────
+  const PARTICLE_COUNT = 1800;
+  const positions = new Float32Array(PARTICLE_COUNT * 3);
+  const sizes     = new Float32Array(PARTICLE_COUNT);
+  const colors    = new Float32Array(PARTICLE_COUNT * 3);
+
+  const colPalette = [
+    new THREE.Color(0xe8ff47),
+    new THREE.Color(0xff4d6d),
+    new THREE.Color(0x00c6ff),
+    new THREE.Color(0xffffff),
+  ];
+
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const r = 10 + Math.random() * 22;
+    const theta = Math.random() * Math.PI * 2;
+    const phi   = Math.acos(2 * Math.random() - 1);
+    positions[i*3]   = r * Math.sin(phi) * Math.cos(theta);
+    positions[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+    positions[i*3+2] = r * Math.cos(phi);
+    sizes[i] = 0.5 + Math.random() * 2.5;
+    const c = colPalette[Math.floor(Math.random() * colPalette.length)];
+    colors[i*3]   = c.r;
+    colors[i*3+1] = c.g;
+    colors[i*3+2] = c.b;
+  }
+
+  const pGeo = new THREE.BufferGeometry();
+  pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  pGeo.setAttribute('color',    new THREE.BufferAttribute(colors, 3));
+  pGeo.setAttribute('size',     new THREE.BufferAttribute(sizes, 1));
+
+  const pMat = new THREE.PointsMaterial({
+    size: 0.12,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.7,
+    sizeAttenuation: true,
+  });
+
+  const particles = new THREE.Points(pGeo, pMat);
+  scene.add(particles);
+
+  // ─── Floating geometric shapes ───────────────────────────────
+  const shapes = [];
+
+  function addShape(geo, color, x, y, z) {
+    const mat = new THREE.MeshBasicMaterial({
+      color,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.12,
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(x, y, z);
+    scene.add(mesh);
+    shapes.push({ mesh, speed: (Math.random() - 0.5) * 0.004, floatSpeed: Math.random() * 0.001 + 0.0005, phase: Math.random() * Math.PI * 2 });
+  }
+
+  addShape(new THREE.IcosahedronGeometry(2.8, 1), 0xe8ff47, -6, 3, -5);
+  addShape(new THREE.OctahedronGeometry(2.2, 0), 0xff4d6d, 6, -2, -6);
+  addShape(new THREE.TetrahedronGeometry(1.8, 0), 0x00c6ff, 0, -4, -4);
+  addShape(new THREE.IcosahedronGeometry(1.5, 0), 0x9945ff, 5, 5, -8);
+  addShape(new THREE.OctahedronGeometry(1.2, 0), 0xe8ff47, -5, -5, -7);
+
+  // ─── Grid plane ───────────────────────────────────────────────
+  const gridHelper = new THREE.GridHelper(60, 30, 0x1a1a1a, 0x111111);
+  gridHelper.position.y = -12;
+  gridHelper.material.transparent = true;
+  gridHelper.material.opacity = 0.4;
+  scene.add(gridHelper);
+
+  // ─── Mouse tracking ───────────────────────────────────────────
+  let mouseX = 0, mouseY = 0;
+  document.addEventListener('mousemove', e => {
+    mouseX = (e.clientX / window.innerWidth  - 0.5) * 2;
+    mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+
+    const cursor = document.getElementById('glowCursor');
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+  });
+
+  // ─── Animation Loop ───────────────────────────────────────────
+  const clock = new THREE.Clock();
+
+  function animate() {
+    requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+
+    // Particles slow rotation
+    particles.rotation.y = t * 0.025;
+    particles.rotation.x = t * 0.012;
+
+    // Camera gentle follow
+    camera.position.x += (mouseX * 1.5 - camera.position.x) * 0.04;
+    camera.position.y += (-mouseY * 1.0 - camera.position.y) * 0.04;
+    camera.lookAt(scene.position);
+
+    // Shapes
+    shapes.forEach(s => {
+      s.mesh.rotation.x += s.speed * 0.8;
+      s.mesh.rotation.y += s.speed;
+      s.mesh.position.y += Math.sin(t * s.floatSpeed * 60 + s.phase) * 0.003;
+    });
+
+    renderer.render(scene, camera);
+  }
+
+  animate();
+
+  // ─── Resize ───────────────────────────────────────────────────
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  // ─── Card ripple on click ─────────────────────────────────────
+  document.querySelectorAll('.link-card').forEach(card => {
+    card.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      const rect   = card.getBoundingClientRect();
+      ripple.style.cssText = `
+        position:absolute; border-radius:50%; pointer-events:none;
+        width:200px; height:200px;
+        background: radial-gradient(circle, rgba(232,255,71,0.15) 0%, transparent 70%);
+        left:${e.clientX - rect.left - 100}px;
+        top:${e.clientY - rect.top - 100}px;
+        transform:scale(0); animation: rippleAnim 0.6s ease forwards;
+        z-index:0;
+      `;
+      card.appendChild(ripple);
+      const style = document.createElement('style');
+      style.textContent = '@keyframes rippleAnim { to { transform:scale(3); opacity:0; } }';
+      document.head.appendChild(style);
+      setTimeout(() => ripple.remove(), 600);
+    });
+  });
+</script>
+</body>
+</html>
