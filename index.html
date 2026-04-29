@@ -6,7 +6,7 @@
   <title>Antonio Sánchez — Creación & Diseño</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     :root {
       --accent: #e8ff47;
@@ -19,7 +19,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Syne', sans-serif;
+      font-family: 'Outfit', sans-serif;
       background: #07070a;
       color: #fff;
       min-height: 100vh;
@@ -89,8 +89,9 @@
 
     /* --- HEADER --- */
     .header-name {
-      font-size: clamp(2rem, 6vw, 3.2rem);
-      font-weight: 800;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.4rem, 7vw, 4rem);
+      font-weight: 700;
       letter-spacing: -1px;
       line-height: 1;
       text-align: center;
@@ -101,20 +102,23 @@
     }
     .header-role {
       margin-top: 8px;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.78rem;
-      letter-spacing: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 5px;
       text-transform: uppercase;
       color: var(--accent);
       text-align: center;
     }
     .header-bio {
       margin-top: 14px;
-      font-size: 0.9rem;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 300;
       color: rgba(255,255,255,0.45);
       text-align: center;
       max-width: 320px;
-      line-height: 1.6;
+      line-height: 1.7;
+      letter-spacing: 0.2px;
     }
 
     /* --- STATS --- */
@@ -136,9 +140,9 @@
       line-height: 1;
     }
     .stat-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 2px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 2.5px;
       color: rgba(255,255,255,0.35);
       text-transform: uppercase;
     }
@@ -229,19 +233,21 @@
       z-index: 1;
     }
     .link-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      letter-spacing: -0.3px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.97rem;
+      font-weight: 600;
+      letter-spacing: -0.2px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     .link-desc {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.68rem;
-      color: rgba(255,255,255,0.4);
-      margin-top: 2px;
-      letter-spacing: 0.5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.64rem;
+      color: rgba(255,255,255,0.38);
+      margin-top: 3px;
+      letter-spacing: 0.3px;
+      font-weight: 300;
     }
 
     .link-arrow {
@@ -282,11 +288,11 @@
 
     /* --- SECTION LABEL --- */
     .section-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
       letter-spacing: 3px;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.22);
       align-self: flex-start;
       margin-bottom: 4px;
       margin-top: 8px;
@@ -298,9 +304,9 @@
       text-align: center;
     }
     .footer-tag {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 2px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 2.5px;
       color: rgba(255,255,255,0.2);
       text-transform: uppercase;
     }
@@ -395,7 +401,7 @@
     <!-- 1 -->
     <a href="https://00010-0.github.io/curso/" target="_blank" class="link-card delay-1">
       <div class="link-icon" style="background:linear-gradient(135deg,#1a1aff22,#0000ff11); border:1px solid #3333ff33">
-        🎓
+        <svg width="20" height="20" fill="none" stroke="#7b8cff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z"/><path d="M6 12v5c0 1.657 2.686 3 6 3s6-1.343 6-3v-5"/></svg>
       </div>
       <div class="link-info">
         <div class="link-title">Curso Online</div>
@@ -410,7 +416,7 @@
     <a href="https://00010-0.github.io/NEXUSNEXTLEVEL/" target="_blank" class="link-card delay-2">
       <span class="link-tag">Featured</span>
       <div class="link-icon" style="background:linear-gradient(135deg,#e8ff4722,#e8ff4711); border:1px solid #e8ff4733">
-        ⚡
+        <svg width="20" height="20" fill="none" stroke="#e8ff47" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
       </div>
       <div class="link-info">
         <div class="link-title">Nexus Next Level</div>
@@ -424,7 +430,7 @@
     <!-- 3 -->
     <a href="https://00010-0.github.io/PomesBurger/" target="_blank" class="link-card delay-3">
       <div class="link-icon" style="background:linear-gradient(135deg,#ff6b0022,#ff6b0011); border:1px solid #ff6b0033">
-        🍔
+        <svg width="20" height="20" fill="none" stroke="#ff8c42" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 7h18M3 12h18M3 17h18"/><path d="M5 7C5 5 7 3 12 3s7 2 7 4"/><path d="M5 17c0 2 2 4 7 4s7-2 7-4"/></svg>
       </div>
       <div class="link-info">
         <div class="link-title">Pomes Burger</div>
@@ -438,7 +444,7 @@
     <!-- 4 -->
     <a href="https://00010-0.github.io/labananastudios/" target="_blank" class="link-card delay-4">
       <div class="link-icon" style="background:linear-gradient(135deg,#ffdd0022,#ffdd0011); border:1px solid #ffdd0033">
-        🍌
+        <svg width="20" height="20" fill="none" stroke="#ffd60a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
       </div>
       <div class="link-info">
         <div class="link-title">La Banana Studios</div>
